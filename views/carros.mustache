@@ -16,7 +16,13 @@
                 </select>
             </div>
             <hr>
+            {{ #carros }}
+            <div class="card m-2 car-list-item">
+                <p>{{ id }}</p>
+                <p>{{ descricao }}</p>
+            </div>
+            {{ /carros }}
             <div class="alert alert-danger">Ainda não foram publicados anúncios de carros.</div>
         </main>
     </body>
-</html
+</html>

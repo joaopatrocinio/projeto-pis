@@ -19,7 +19,12 @@ app.get("/", (req, res) => {
 })
 
 app.get("/carros", (req, res) => {
-    res.render("carros")
+    db.query("SELECT * FROM carro", (err, result) => {
+        if (err) return res.status(500).json({ message: "Erro na base de dados." });
+        res.render("carros", {
+            carros: result
+        })
+    })
 })
 
 app.listen(process.env.PORT, () => {
