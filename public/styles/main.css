@@ -1,0 +1,49 @@
+body {
+    background: rgb(194,194,194);
+background: linear-gradient(262deg, rgba(194,194,194,1) 8%, rgba(242,242,242,1) 59%);
+}
+
+#slogan {
+    position: absolute;
+    top: 250px;
+    left: 10%;
+    color: #383838;
+    background-color: #ffda64d1;
+    height: 150px;
+    border-radius: 50%;
+    text-align: center;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3em;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    width: min-content;
+    height: fit-content;
+}
+
+#img-slide {
+    width: 100%;
+}
+
+.fa-user-minus, .fa-user-edit, .fa-plus {
+    cursor: pointer;
+}
+
+/*.view {
+    display: none;
+}*/
+
+#usersTable, #marcaTable, #modeloTable {
+    background-color: white;
+    border-color: black !important;
+}
+
+.car-list-item {
+    width: 300px;
+}
+
+.detalhes-img {
+    width: 100%;
+}
