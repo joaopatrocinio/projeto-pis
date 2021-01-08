@@ -27,6 +27,15 @@ app.get("/carros", (req, res) => {
     })
 })
 
+app.get("/login", (req, res) => {
+   
+        res.render("login", {
+           
+        })
+  
+})
+
+
 app.listen(process.env.PORT, () => {
     console.log("Servidor ligado na porta " + process.env.PORT)
 })

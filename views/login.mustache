@@ -1,0 +1,77 @@
+<html>
+{{ >head }}
+
+<body>
+    {{ >nav }}
+    <main class="container-sm view" id="login" style="display: block;">
+        <div class="card-group my-5">
+            <div class="card p-4">
+                <h4 class="mb-4 display-4 pb-2 border-bottom">Registo</h4>
+                <form style="display: block;" action="/registo" method="post">
+                    <div class="form-group">
+                        <label for="registoPrimeiroNome">Primeiro nome:</label>
+                        <input type="text" class="form-control" placeholder="Digite o seu primeiro nome"
+                            id="registoPrimeiroNome" required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="registoApelido">Apelido:</label>
+                        <input type="text" class="form-control" placeholder="Digite o seu apelido" id="registoApelido"
+                            required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="registoEmail">Email:</label>
+                        <input type="email" class="form-control" placeholder="Digite o seu email" id="registoEmail"
+                            required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="registoPassword">Password:</label>
+                        <input type="password" class="form-control" placeholder="Digite a password desejada"
+                            id="registoPassword" required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="registoContacto">Contacto (Tlm.):</label>
+                        <input type="text" class="form-control" placeholder="Digite o seu contacto telefónico"
+                            id="registoContacto" maxlength="9" required="">
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="userType2" name="registoTipoUser"
+                                value="2" required="">
+                            <label class="custom-control-label" for="userType2">Vendedor</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" id="userType3" name="registoTipoUser"
+                                value="3" required="">
+                            <label class="custom-control-label" for="userType3">Utilizador (Comprador)</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registo</button>
+                </form>
+            </div>
+            <div class="card p-4">
+                <div class="my-auto">
+                    <h4 class="mb-4 display-4 pb-2 border-bottom">Login</h4>
+                    <form style="display: block;" action="login" method="post">
+                        <div class="form-group">
+                            <label for="loginEmail">Email:</label>
+                            <input type="email" class="form-control" placeholder="Digite o seu email" id="loginEmail">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password:</label>
+                            <input type="password" class="form-control" placeholder="Digite a sua password"
+                                id="loginPassword">
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="loginRememberMe">
+                                <label class="custom-control-label" for="loginRememberMe">Lembrar me</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    </body>
+</html>
