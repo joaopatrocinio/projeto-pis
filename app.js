@@ -8,7 +8,7 @@ const app = express()
 app.use(cors())
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
-app.set('views', __dirname + '/views'); 
+app.set('views', __dirname + '/views');
 
 const db = require("./database");
 
@@ -20,19 +20,62 @@ app.get("/", (req, res) => {
 
 app.get("/carros", (req, res) => {
     db.query("SELECT * FROM carro", (err, result) => {
-        if (err) return res.status(500).json({ message: "Erro na base de dados." });
+        if (err) return res.status(500).json({
+            message: "Erro na base de dados."
+        });
         res.render("carros", {
             carros: result
         })
     })
 })
+app.get("/utilizadores", (req, res) => {
+    db.query("SELECT * FROM users ", (err, result) => {
+        if (err) return res.status(500).json({
+            message: "Erro na base de dados."
+        });
+        res.render("utilizadores", {
+            users: result
+        })
+    })
+})
+
+app.get("/marcas", (req, res) => {
+    db.query("SELECT * FROM marca", (err, result) => {
+        if (err) return res.status(500).json({
+            message: "Erro na base de dados."
+        });
+        res.render("marcas", {
+            marcas: result
+        })
+    })
+})
+
+app.get("/modelos", (req, res) => {
+    db.query("SELECT * FROM modelo ", (err, result) => {
+        if (err) return res.status(500).json({
+            message: "Erro na base de dados."
+        });
+        db.query("SELECT marcaNome FROM marca where id = ? ",[result.modeloMarcaId], (err, result2) => {
+            if (err) return res.status(500).json({
+                message: "Erro na base de dados."
+            });
+            res.render("modelos", {
+                modelos: result,
+                nome : result2
+            })
+        })
+        
+    })
+})
+
+
+app.get("/estatisticas", (req, res) => {
+    res.render("estatisticas")
+})
+
 
 app.get("/login", (req, res) => {
-   
-        res.render("login", {
-           
-        })
-  
+    res.render("login")
 })
 
 

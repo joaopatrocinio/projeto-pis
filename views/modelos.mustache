@@ -1,0 +1,40 @@
+<html>
+{{ >head }}
+
+<body>
+    {{ >nav }}
+    <main class="my-5">
+        <h4 class="display-4">Modelos</h4>
+        <table id="modeloTable" class="table table-striped table-bordered rounded">
+            <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td>Marca</td>
+                    <td>Modelo</td>
+                    <td></td>
+                </tr>
+
+                {{ #modelos }}
+                <tr>
+
+                    <td>{{ id }}</td>
+                    {{#nome}} <td> {{marcaNome}}</td> {{/nome }}
+                    <td>{{ modeloNome  }}</td>
+                    <td><i class="fas fa-user-edit" title="Editar" data-toggle="modal" data-target="#updateModeloModal"
+                            onclick="info.carregarModeloModal({{ id }})" aria-hidden="true"></i></td>
+                </tr>
+                {{ /modelos }}
+
+
+
+                <tr>
+                    <td><i class="fas fa-plus" title="Adicionar marca" data-toggle="modal"
+                            data-target="#adicionarModeloModal" onclick="info.carregarMarcasInserir()"
+                            aria-hidden="true"></i><span class="sr-only">Adicionar marca</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+
+</html>
