@@ -51,21 +51,15 @@ app.get("/marcas", (req, res) => {
 })
 
 app.get("/modelos", (req, res) => {
-    db.query("SELECT * FROM modelo ", (err, result) => {
+    db.query("SELECT modelo.id,modelo.modeloNome,marca.marcaNome FROM modelo JOIN marca  ON modelo.modeloMarcaId=marca.id ", (err, result) => {
         if (err) return res.status(500).json({
             message: "Erro na base de dados."
         });
-        db.query("SELECT marcaNome FROM marca where id = ? ",[result.modeloMarcaId], (err, result2) => {
-            if (err) return res.status(500).json({
-                message: "Erro na base de dados."
-            });
-            res.render("modelos", {
-                modelos: result,
-                nome : result2
-            })
+        res.render("modelos", {
+            modelos: result
         })
-        
-    })
+           
+        })
 })
 
 

@@ -16,9 +16,8 @@
 
                 {{ #modelos }}
                 <tr>
-
                     <td>{{ id }}</td>
-                    {{#nome}} <td> {{marcaNome}}</td> {{/nome }}
+                    <td>{{marcaNome}}</td> 
                     <td>{{ modeloNome  }}</td>
                     <td><i class="fas fa-user-edit" title="Editar" data-toggle="modal" data-target="#updateModeloModal"
                             onclick="info.carregarModeloModal({{ id }})" aria-hidden="true"></i></td>
