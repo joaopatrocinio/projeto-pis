@@ -1,6 +1,40 @@
 <html>
 {{ >head }}
+<script>
 
+addMarc(){
+        var old_element = document.getElementById("Adicionar-Marca");
+        var new_element = old_element.cloneNode(true);
+        old_element.parentNode.replaceChild(new_element, old_element);
+        document.getElementById("Adicionar-Marca").addEventListener("click", function () {
+            const xhr = new XMLHttpRequest();
+            const request = JSON.stringify({
+                marcaNome: document.getElementById("nomeMarca-insert").value
+            });
+
+            xhr.open("POST", "/marcas");
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.responseType = "json";
+            let self = this;
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        let marca = new Marca(
+                            xhr.response.id,
+                            document.getElementById("nomeMarca-insert").value
+                        );
+                        info.marcas.push(marca)
+                        document.getElementById("nomeMarca-insert").value = "";
+                        info.showMarcas();
+                    } else {
+                        console.error("Erro ao inserir marca no servidor.");
+                    }
+                }
+            };
+            xhr.send(request);
+        });
+    }
+</script>
 <body>
     {{ >nav }}
     
@@ -19,7 +53,7 @@
                         <td>{{ marcaNome  }}</td>
                         <td>
                         <td><i class="fas fa-user-edit" title="Editar" data-toggle="modal" data-target="#updateMarca"
-                                onclick="info.updateMarca({{ id }})" aria-hidden="true"></i><span
+                                onclick="updateMarca({{ id }})" aria-hidden="true"></i><span
                                 class="sr-only">Editar</span></td>
                         </td>
                     </tr>
@@ -28,11 +62,30 @@
 
                     <tr>
                         <td><i class="fas fa-plus" title="Nova marca" data-toggle="modal"
-                                data-target="#adicionarMarcaModal" onclick="info.addMarc()" aria-hidden="true"></i><span
+                                data-target="#adicionarMarcaModal" onclick="addMarc()" aria-hidden="true"></i><span
                                 class="sr-only">Nova marca</span></td>
                     </tr>
                 </tbody>
             </table>
+
+            <div class="modal-dialog" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h4 class="modal-title">Adicionar Marca</h4>
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nomeMarca-insert">Nome:</label>
+                                <input type="modelo" class="form-control" placeholder="Introduza a Marca" id="nomeMarca-insert">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal" id="Adicionar-Marca">Gravar</button>
+                        </div>
+                    </div>
+                </div>
         </main>
     
 </body>

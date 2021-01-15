@@ -4,9 +4,10 @@ const db = require('../database');
 const checkLogin = require("../authentication/check-login")
 
 function getMarcas(req, res) {
-    mysqlPool.query(mysql.format('SELECT * FROM marca'), function (err, rows) {
-        if (err) { throw err }
-        else {
+    db.query(mysql.format('SELECT * FROM marca'), function (err, rows) {
+        if (err) {
+            throw err
+        } else {
             res.json(rows)
         }
     });
@@ -14,9 +15,10 @@ function getMarcas(req, res) {
 
 function getMarcaById(req, res) {
     if (req.params.id) {
-        mysqlPool.query(mysql.format('SELECT * FROM marca WHERE id = ?', [req.params.id]), function (err, rows) {
-            if (err) { throw err }
-            else {
+        db.query(mysql.format('SELECT * FROM marca WHERE id = ?', [req.params.id]), function (err, rows) {
+            if (err) {
+                throw err
+            } else {
                 res.json(rows)
             }
         });
@@ -25,10 +27,14 @@ function getMarcaById(req, res) {
 
 function inserirMarcas(req, res) {
     if (req.body.marcaNome) {
-        mysqlPool.query(mysql.format('INSERT INTO marca (marcaNome) VALUES (?)', [req.body.marcaNome]), function (err, rows) {
-            if (err) { throw err }
-            else {
-                res.json({ message: "Marca inserida com sucesso.", id: rows.insertId });
+        db.query(mysql.format('INSERT INTO marca (marcaNome) VALUES (?)', [req.body.marcaNome]), function (err, rows) {
+            if (err) {
+                throw err
+            } else {
+                res.json({
+                    message: "Marca inserida com sucesso.",
+                    id: rows.insertId
+                });
             }
         });
     }
@@ -37,10 +43,13 @@ function inserirMarcas(req, res) {
 function updateMarcas(req, res) {
     if (req.params.id) {
         if (req.body.marcaNome) {
-            mysqlPool.query(mysql.format('UPDATE marca SET marcaNome = ? WHERE id = ?', [req.body.marcaNome, req.params.id]), function (err, rows) {
-                if (err) { throw err }
-                else {
-                    res.json({ message: "Marca atualizada com sucesso." });
+            db.query(mysql.format('UPDATE marca SET marcaNome = ? WHERE id = ?', [req.body.marcaNome, req.params.id]), function (err, rows) {
+                if (err) {
+                    throw err
+                } else {
+                    res.json({
+                        message: "Marca atualizada com sucesso."
+                    });
                 }
             });
         }
