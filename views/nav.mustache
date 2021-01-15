@@ -12,10 +12,53 @@
                 <i class="fas fa-car-side"></i> Carros
             </a>
         </li>
+        {{ #isAdmin }}
         <li class="nav-item">
-            <a class="nav-link" href="/login" id="nav-login">
-                <i class="fas fa-user"></i> Login / Registo
+            <a class="nav-link" href="/utilizadores" id="nav-marcas">
+                <i class='fas fa-users'></i> Utilizadores
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/marcas" id="nav-marcas">
+                <i class='fas fa-users'></i> Marcas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/utilizadores" id="nav-marcas">
+                <i class='fas fa-users'></i> Modelos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/utilizadores" id="nav-marcas">
+                <i class='fas fa-users'></i> Estatistica
+            </a>
+        </li>
+        {{ /isAdmin }}
+        {{ #isSeller }}
+            <li class="nav-item">
+                <a class="nav-link" href="/utilizadores" id="nav-marcas">
+                    <i class='fas fa-users'></i> Criar anúncio
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/utilizadores" id="nav-marcas">
+                    <i class='fas fa-users'></i> Meus anúncios
+                </a>
+            </li>
+        {{ /isSeller }}
+        {{ ^token }}
+            <li class="nav-item">
+                <a class="nav-link" href="/login" id="nav-login">
+                    <i class="fas fa-user"></i> Login / Registo
+                </a>
+            </li>
+        {{ /token }}
+        {{ #token }}
+            <li class="nav-item">
+                <a class="nav-link" href="/logout" id="nav-login">
+                    <i class="fas fa-user"></i> Logout
+                </a>
+            </li>
+        {{ /token }}
     </ul>
 </nav>

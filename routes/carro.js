@@ -3,6 +3,8 @@ const mysql = require('mysql');
 const db = require('../database');
 const fs = require('fs');
 
+const checkLogin = require("../authentication/check-login");
+
 function getCarros(req, res) {
     db.query(mysql.format('SELECT * FROM carro'), function (err, rows) {
         if (err) {
@@ -163,12 +165,12 @@ router.get("/", getCarros);
 router.get("/id/:id", getCarroById);
 router.get("/atributos", getAtributos);
 
-router.get("/:carro_id/contacto", require("../authentication/check-login"), verContacto);
-router.post("/", require("../authentication/check-login"), inserirCarro);
+router.get("/:carro_id/contacto", verContacto);
+router.post("/", inserirCarro);
 
-router.get("/views/:id", require("../authentication/check-login"), getViews);
-router.get("/views/getViews/getTotal", require("../authentication/check-admin"), getViewsTotal);
+router.get("/views/:id", getViews);
+router.get("/views/getViews/getTotal", getViewsTotal);
 
-router.post("/imagem/id/:id", require("../authentication/check-login"), uploadPhoto);
+router.post("/imagem/id/:id", uploadPhoto);
 
 module.exports = router;

@@ -1,0 +1,8 @@
+bcrypt
+express
+mustache
+mysql
+dotenv
+axios
+jsonwebtoken
+cookie-parser
