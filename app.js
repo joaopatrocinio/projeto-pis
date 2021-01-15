@@ -27,8 +27,9 @@ app.use("/api/utilizadores", require("./routes/utilizadores"))
 app.use(express.static("./public"));
 
 app.get("/", (req, res) => {
+    if (!req.cookies.access_token) return res.render("home");
     jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return false
+        if (err) console.log(err)
         db.query('SELECT id, email, firstName, lastName, userTypeId FROM users WHERE id = ?;', [decoded.id], (err, result) => {
             if (!result) {
                 return false;
@@ -47,7 +48,37 @@ app.get("/estatisticas", (req, res) => {
     res.render("estatisticas")
 })
 
+app.get("/carros", (req, res) => {
+    if (!req.cookies.access_token) return res.render("carros");
+    axios.get("http://localhost:8080/api/carro")
+    .then(response => {
+        jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err) return false
+            db.query(`
+                SELECT id, email, firstName, lastName, userTypeId FROM users WHERE id = ?;
+                SELECT * FROM marca;
+            `, [decoded.id], (err, result) => {
+                if (!result[0]) {
+                    return false;
+                }
+                res.render("carros", {
+                    carros: response.data,
+                    marcas: result[1],
+                    token: req.cookies.access_token,
+                    isAdmin: result[0][0].userTypeId == 1 ? true : false,
+                    isSeller: result[0][0].userTypeId == 2 ? true : false,
+                    isBuyer: result[0][0].userTypeId == 3 ? true : false
+                })
+            });
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 app.get("/marcas", (req, res) => {
+    if (!req.cookies.access_token) return res.render("403");
     axios.get("http://localhost:8080/api/marcas")
     .then(response => {
         jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, decoded) => {
@@ -73,6 +104,11 @@ app.get("/marcas", (req, res) => {
 
 app.get("/login", (req, res) => {
     res.render("login")
+})
+
+app.get("/logout", (req, res) => {
+    res.clearCookie("access_token");
+    res.redirect("/")
 })
 
 app.listen(process.env.PORT, () => {

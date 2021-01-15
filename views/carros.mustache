@@ -9,6 +9,9 @@
                 <label class="mr-2">Marcas:</label>
                 <select class="form-control mr-2">
                     <option value="-1">Todos</option>
+                    {{ #marcas }}
+                        <option value="{{ id }}">{{ marcaNome }}</option>
+                    {{ /marcas }}
                 </select>
                 <label class="mr-2">Modelos:</label>
                     <select class="form-control">
@@ -17,12 +20,18 @@
             </div>
             <hr>
             {{ #carros }}
-            <div class="card m-2 car-list-item">
-                <p>{{ id }}</p>
-                <p>{{ descricao }}</p>
-            </div>
+                <div class="card m-2 car-list-item">
+                    <img class="card-img-top" src="uploads/{{ imagem }}">
+                    <div class="card-body">
+                        <h5>{{ descricao }}</h5>
+                        <p>{{ valor }}€</p>
+                        <button class="btn btn-secondary float-right">Detalhes</button>
+                    </div>
+                </div>
             {{ /carros }}
-            <div class="alert alert-danger">Ainda não foram publicados anúncios de carros.</div>
+            {{ ^carros}}
+                <div class="alert alert-danger">Ainda não foram publicados anúncios de carros.</div>
+            {{ /carros }}
         </main>
     </body>
 </html>

@@ -6,7 +6,7 @@ const fs = require('fs');
 const checkLogin = require("../authentication/check-login");
 
 function getCarros(req, res) {
-    db.query(mysql.format('SELECT * FROM carro'), function (err, rows) {
+    db.query(mysql.format('SELECT carro.*, atributos.valor FROM carro INNER JOIN atributos ON carroid = id GROUP BY id'), function (err, rows) {
         if (err) {
             throw err
         } else {
