@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const mysql = require('mysql');
-const mysqlPool = require('../config/mysql-pool');
+const db = require('../database');
 const fs = require('fs');
 
 function getCarros(req, res) {

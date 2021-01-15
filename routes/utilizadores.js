@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const mysql = require('mysql');
-const mysqlPool = require('../config/mysql-pool');
+const db = require('../database');
 
 function getUtilizadores(req, res) {
     mysqlPool.query(mysql.format('SELECT id, email, firstName, lastName, userTypeId, contacto FROM users'), function (err, rows) {

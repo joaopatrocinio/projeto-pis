@@ -12,56 +12,17 @@ app.set('views', __dirname + '/views');
 
 const db = require("./database");
 
+app.use("/auth", require("./routes/auth"))
+app.use("/carro", require("./routes/carro"))
+app.use("/marcas", require("./routes/marcas"))
+app.use("/modelos", require("./routes/modelos"))
+app.use("/utilizadores", require("./routes/utilizadores"))
+
 app.use(express.static("./public"));
 
 app.get("/", (req, res) => {
     res.render("home")
 })
-
-app.get("/carros", (req, res) => {
-    db.query("SELECT * FROM carro", (err, result) => {
-        if (err) return res.status(500).json({
-            message: "Erro na base de dados."
-        });
-        res.render("carros", {
-            carros: result
-        })
-    })
-})
-app.get("/utilizadores", (req, res) => {
-    db.query("SELECT * FROM users ", (err, result) => {
-        if (err) return res.status(500).json({
-            message: "Erro na base de dados."
-        });
-        res.render("utilizadores", {
-            users: result
-        })
-    })
-})
-
-app.get("/marcas", (req, res) => {
-    db.query("SELECT * FROM marca", (err, result) => {
-        if (err) return res.status(500).json({
-            message: "Erro na base de dados."
-        });
-        res.render("marcas", {
-            marcas: result
-        })
-    })
-})
-
-app.get("/modelos", (req, res) => {
-    db.query("SELECT modelo.id,modelo.modeloNome,marca.marcaNome FROM modelo JOIN marca  ON modelo.modeloMarcaId=marca.id ", (err, result) => {
-        if (err) return res.status(500).json({
-            message: "Erro na base de dados."
-        });
-        res.render("modelos", {
-            modelos: result
-        })
-           
-        })
-})
-
 
 app.get("/estatisticas", (req, res) => {
     res.render("estatisticas")
@@ -71,7 +32,6 @@ app.get("/estatisticas", (req, res) => {
 app.get("/login", (req, res) => {
     res.render("login")
 })
-
 
 app.listen(process.env.PORT, () => {
     console.log("Servidor ligado na porta " + process.env.PORT)

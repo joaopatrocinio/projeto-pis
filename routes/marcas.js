@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const mysql = require('mysql');
-const mysqlPool = require('../config/mysql-pool');
+const db = require('../database');
 const checkLogin = require("../authentication/check-login")
 
 function getMarcas(req, res) {
