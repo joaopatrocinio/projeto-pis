@@ -4,18 +4,18 @@ const db = require('../database');
 const bcrypt = require('bcrypt');
 
 function login(req, res, next) {
-    if (req.body.user_email && req.body.user_password) {
-        db.query('SELECT * from user WHERE user_email = ?', [req.body.user_email], (err, result) => {
+    if (req.body.email && req.body.password) {
+        db.query('SELECT * from users WHERE email = ?', [req.body.email], (err, result) => {
             if (err) return res.status(500).json({ message: 'Ocorreu um erro a identificar o utilizador.' });
             if (!result[0]) {
                 return res.status(401).json({ message: 'Autenticação falhada, credenciais incorretas.' });
             }
-            var passwordIsValid = bcrypt.compareSync(req.body.user_password, result[0].user_password);
+            var passwordIsValid = bcrypt.compareSync(req.body.password, result[0].password);
             if (!passwordIsValid) {
                 return res.status(401).json({ response: 'Autenticação falhada, credenciais incorretas.' });
             }
             var token = jwt.sign({
-                id: result[0].user_id,
+                id: result[0].id,
             }, process.env.JWT_SECRET, {
                 expiresIn: 6064800 // expires in 1 week
             });
@@ -35,7 +35,7 @@ function me(req, res) {
     if (!token) return res.status(401).json({ message: 'Pedido necessita do token de identificação.' });
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(500).json({ message: 'Ocorreu um erro a identificar o utilizador.' });
-        db.query('SELECT user_id, user_email, user_fullname FROM user WHERE user_id = ?;', [decoded.id], (err, result) => {
+        db.query('SELECT id, email, firstName, lastName FROM user WHERE id = ?;', [decoded.id], (err, result) => {
             if (!result[0]) {
                 return res.status(404).json({ message: 'Token inválido.' });
             }
