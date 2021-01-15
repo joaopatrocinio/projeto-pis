@@ -53,6 +53,26 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" id="updateMarca">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Atualizar Marca</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nomeMarca-Update">Nome da marca:</label>
+                                <input type="text" class="form-control" placeholder="Introduza a marca" id="nomeMarca-Update">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal" id="update-marca">Gravar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     
 </body>
@@ -82,6 +102,34 @@ function addMarc() {
 }
 
 document.getElementById("Adicionar-Marca").addEventListener("click", function () { addMarc() });
+
+
+
+ function updateMarca(id) {
+        var old_element = document.getElementById("update-marca");
+        var new_element = old_element.cloneNode(true);
+        old_element.parentNode.replaceChild(new_element, old_element);
+        document.getElementById("update-marca").addEventListener("click", function () {
+            const xhr = new XMLHttpRequest();
+            const request = JSON.stringify({
+                marcaNome: document.getElementById("nomeMarca-Update").value
+            });
+            xhr.open("PUT", "/api/marcas/id/" + id);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.responseType = "json";
+            let self = this;
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                       window.location.reload();
+                    } else {
+                        console.error("Erro ao atulizador marca no servidor.");
+                    }
+                }
+            };
+            xhr.send(request);
+        })
+    }
 </script>
 
 </html>
