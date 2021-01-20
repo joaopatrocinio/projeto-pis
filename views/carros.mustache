@@ -7,31 +7,72 @@
             <hr>
             <div class="form-inline">
                 <label class="mr-2">Marcas:</label>
-                <select class="form-control mr-2">
+                <select class="form-control mr-2" id="selectMarcas">
                     <option value="-1">Todos</option>
                     {{ #marcas }}
                         <option value="{{ id }}">{{ marcaNome }}</option>
                     {{ /marcas }}
                 </select>
                 <label class="mr-2">Modelos:</label>
-                    <select class="form-control">
-                <option value="-1">Todos</option>
+                <select class="form-control" id="selectModelo">
+                    <option value="-1">Todos</option>
                 </select>
             </div>
             <hr>
+            <div id="carrosList" class="d-flex justify-content-around flex-wrap">
             {{ #carros }}
                 <div class="card m-2 car-list-item">
                     <img class="card-img-top" src="uploads/{{ imagem }}">
                     <div class="card-body">
                         <h5>{{ descricao }}</h5>
-                        <p>{{ valor }}€</p>
+                        <p>{{ preco }}€</p>
                         <button class="btn btn-secondary float-right">Detalhes</button>
                     </div>
                 </div>
             {{ /carros }}
+            </div>
             {{ ^carros}}
                 <div class="alert alert-danger">Ainda não foram publicados anúncios de carros.</div>
             {{ /carros }}
         </main>
     </body>
+    <script>
+        let selectMarcas = document.getElementById("selectMarcas")
+        let selectModelo = document.getElementById("selectModelo")
+        let marcas = [];
+        let modelos = [];
+
+        {{ #marcas }}
+            marcas.push({
+                id: {{ id }},
+                marcaNome: "{{ marcaNome }}" 
+            })
+        {{ /marcas }}
+
+        {{ #modelos }}
+            modelos.push({
+                id: {{ id }},
+                modeloNome: "{{ modeloNome }}",
+                marcaId: {{ modeloMarcaId }}
+            })
+        {{ /modelos }}
+
+        selectMarcas.addEventListener("change", function (event) {
+            selectModelo.innerHTML = "";
+            let op = document.createElement("Option");
+            op.value = -1;
+            op.innerText = "Todos";
+            selectModelo.appendChild(op);
+            for (let modelo of modelos) {
+                if (modelo.marcaId == event.target.value) {
+                    let op = document.createElement("Option");
+                    op.value = modelo.id;
+                    op.innerText = modelo.modeloNome;
+                    selectModelo.appendChild(op);
+                }
+            }
+
+            // É preciso fazer refresh na pagina com os dados novos com um botão a frente dos filtros
+        });
+    </script>
 </html>

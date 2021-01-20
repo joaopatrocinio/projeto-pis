@@ -6,3 +6,4 @@ dotenv
 axios
 jsonwebtoken
 cookie-parser
+passport
