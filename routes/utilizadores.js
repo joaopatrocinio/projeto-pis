@@ -1,9 +1,8 @@
 const router = require('express').Router();
-const mysql = require('mysql');
 const db = require('../database');
 
 function getUtilizadores(req, res) {
-    db.query(mysql.format('SELECT id, email, firstName, lastName, userTypeId, contacto FROM users'), function (err, rows) {
+    db.query('SELECT id, email, firstName, lastName, userTypeId, contacto FROM users', function (err, rows) {
         if (err) {
             throw err
         } else {
@@ -14,7 +13,7 @@ function getUtilizadores(req, res) {
 
 function getUtilizadoresById(req, res) {
     if (req.params.id) {
-        db.query(mysql.format('SELECT id, email, firstName, lastName, userTypeId, contacto FROM users WHERE id = ?', [req.params.id]), function (err, rows) {
+        db.query('SELECT id, email, firstName, lastName, userTypeId, contacto FROM users WHERE id = ?', [req.params.id], function (err, rows) {
             if (err) {
                 throw err
             } else {
@@ -25,6 +24,7 @@ function getUtilizadoresById(req, res) {
 }
 
 function updateUtilizador(req, res) {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
     if (req.params.id &&
         req.body.firstName &&
         req.body.lastName &&
@@ -34,14 +34,14 @@ function updateUtilizador(req, res) {
     ) {
         // verificar se utilizador é vendedor ou administrador
         if (req.user.userTypeId < 3) {
-            db.query(mysql.format('UPDATE users SET email = ?, firstName = ?, lastName = ?, userTypeId = ?, contacto = ? WHERE id = ?', [
+            db.query('UPDATE users SET email = ?, firstName = ?, lastName = ?, userTypeId = ?, contacto = ? WHERE id = ?', [
                 req.body.email,
                 req.body.firstName,
                 req.body.lastName,
                 req.body.userTypeId,
                 req.body.contacto,
                 req.params.id
-            ]), function (err, rows) {
+            ], function (err, rows) {
                 if (err) {
                     throw err
                 } else {
@@ -63,9 +63,10 @@ function updateUtilizador(req, res) {
 }
 
 function deleteUtilizador(req, res) {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
     if (req.params.id) {
         if (req.params.id != req.user.id) {
-            db.query(mysql.format('DELETE FROM users WHERE id = ?', [req.params.id]), function (err, rows) {
+            db.query('DELETE FROM users WHERE id = ?', [req.params.id], function (err, rows) {
                 if (err) {
                     throw err
                 } else {
@@ -83,7 +84,7 @@ function deleteUtilizador(req, res) {
 }
 
 function getUserTypes(req, res) {
-    db.query(mysql.format('SELECT * FROM userstype'), function (err, rows) {
+    db.query('SELECT * FROM userstype', function (err, rows) {
         if (err) {
             throw err
         } else {
@@ -94,8 +95,8 @@ function getUserTypes(req, res) {
 
 router.get("/", getUtilizadores);
 router.get("/id/:id", getUtilizadoresById);
-router.put("/id/:id", require("../authentication/check-admin"), updateUtilizador);
-router.delete("/id/:id", require("../authentication/check-admin"), deleteUtilizador);
+router.put("/id/:id", updateUtilizador);
+router.delete("/id/:id", deleteUtilizador);
 router.get("/tipos", getUserTypes);
 
 module.exports = router;

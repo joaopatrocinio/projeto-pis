@@ -1,191 +1,71 @@
 const router = require('express').Router();
-const mysql = require('mysql');
-const db = require('../database');
-const fs = require('fs');
+const carros = require("../controllers/CarroController")
+const checkToken = require("../authentication/check-token")
 
-const checkLogin = require("../authentication/check-login");
+router.get("/", (req, res) => {
+    carros.getCarros()
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function getCarros(req, res) {
-    db.query(mysql.format('SELECT * FROM carro'), function (err, rows) {
-        if (err) {
-            throw err
-        } else {
-            db.query(mysql.format('SELECT * FROM atributos'), function (err, rows2) {
-                if (err) {
-                    throw err
-                }
-                res.json(rows.map(carro => {
-                    carro.atributos = rows2.map(atributo => {
-                        if (atributo.carroid == carro.id) {
-                            return {
-                                atributo: atributo.atributo,
-                                valor: atributo.valor
-                            }
-                        }
-                    });
-                    return carro
-                }))
-            });
-        }
-    });
-}
+router.get("/id/:id", (req, res) => {
+    carros.getCarroById(req.params.id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function getCarroById(req, res) {
-    if (req.params.id) {
-        db.query(mysql.format('SELECT * FROM carro WHERE id = ?', [req.params.id]), function (err, rows) {
-            if (err) {
-                throw err
-            } else {
-                res.json(rows)
-            }
-        });
-    }
-}
+router.get("/:carro_id/contacto", checkToken, (req, res) => {
+    carros.verContacto(req.params.carro_id, req.user.id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function getAtributos(req, res) {
-    db.query(mysql.format('SELECT * FROM atributos'), function (err, rows) {
-        if (err) {
-            throw err
-        } else {
-            res.json(rows);
-        }
-    });
-}
+router.post("/", checkToken, (req, res) => {
+    if (req.isBuyer) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    carros.inserirCarro(
+        req.body.marcaId, 
+        req.body.modeloId, 
+        req.body.descricao, 
+        req.body.ano, 
+        req.body.preco, 
+        req.body.quilometro, 
+        req.body.velocidadeMax, 
+        req.body.cilindrada, 
+        req.body.combustivel, 
+        req.body.imagem, 
+        req.body.potencia, 
+        req.body.tipCaixa, 
+        req.user.id
+    )
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function verContacto(req, res) {
-    db.query(mysql.format('SELECT f_contacto_carro(?) as "contacto"', [req.params.carro_id]), function (err, rows) {
-        if (err) {
-            throw err
-        } else {
-            let result = rows[0];
+router.get("/views/:id", checkToken, (req, res) => {
+    if (req.isBuyer) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    carros.getViews(req.params.id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-            db.query(mysql.format('INSERT INTO log_mostrar_contacto (carroId, userId) VALUES (?, ?)', [req.params.carro_id, req.user.id]), function (err, rows) {
-                if (err) {
-                    throw err
-                } else {
-                    res.json(result);
-                }
-            });
-        }
-    });
-}
+router.get("/views/getViews/getTotal", checkToken, (req, res) => {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    carros.getViewsTotal()
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function inserirCarro(req, res) {
-    if (req.body.marcaId &&
-        req.body.modeloId &&
-        req.body.descricao &&
-        req.body.ano &&
-        req.body.preco &&
-        req.body.quilometro &&
-        req.body.velocidadeMax &&
-        req.body.cilindrada &&
-        req.body.combustivel &&
-        req.body.imagem &&
-        req.body.potencia &&
-        req.body.tipoCaixa
-    ) {
-        // verificar se utilizador é vendedor ou administrador
-        if (req.user.userTypeId < 3) {
-            db.query(mysql.format('CALL sp_inserir_carro(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
-                req.body.marcaId,
-                req.body.modeloId,
-                req.body.descricao,
-                req.body.ano,
-                req.body.preco,
-                req.body.quilometro,
-                req.body.velocidadeMax,
-                req.body.cilindrada,
-                req.user.id,
-                req.body.combustivel,
-                req.body.imagem,
-                req.body.potencia,
-                req.body.tipoCaixa
-            ]), function (err, rows) {
-                if (err) {
-                    throw err
-                } else {
-                    res.json({
-                        message: "Carro inserido com sucesso."
-                    });
-                }
-            });
-        } else {
-            res.status(401).json({
-                message: "A sua conta não lhe permite inserir anúncios."
-            });
-        }
+router.post("/imagem/id/:id", checkToken, (req, res) => {
+    if (req.isBuyer) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    if (req.files) {
+        carros.uploadPhoto(req.params.id, req.files.file)
+        .then(result => res.json(result))
+        .catch(err => console.log(err))
     } else {
         res.status(400).json({
-            message: "Campos em falta."
+            message: "É obrigatório enviar uma imagem."
         });
     }
-}
-
-function getViews(req, res) {
-    if (req.params.id) {
-        db.query(mysql.format("SELECT count(*) as views FROM log_mostrar_contacto where carroId = ?", [req.params.id]), function (err, rows) {
-            if (err) {
-                throw err
-            } else {
-                res.json(rows[0]);
-            }
-        })
-    }
-}
-
-function getViewsTotal(req, res) {
-    db.query(mysql.format("SELECT count(*) as views FROM log_mostrar_contacto"), function (err, rows) {
-        if (err) {
-            throw err
-        } else {
-            res.json(rows[0]);
-        }
-    })
-}
-
-function uploadPhoto(req, res) {
-    if (!fs.existsSync("./www/uploads/")) {
-        fs.mkdirSync("./www/uploads/");
-    }
-    if (req.params.id) {
-        if (req.files) {
-            var file = req.files.file;
-            var filename = req.params.id + "." + file.mimetype.split("/")[1];
-
-            if (file.mimetype.split("/")[0] == "image") {
-                file.mv("./www/uploads/" + filename, function (err) {
-                    if (err) return res.status(500).json({
-                        message: "Erro ao enviar ficheiro."
-                    });
-                    res.json({
-                        message: "Ficheiro enviado com sucesso.",
-                        filename: filename
-                    });
-                })
-            } else {
-                res.status(400).json({
-                    message: "Não são suportados ficheiros que não sejam imagens."
-                });
-            }
-        } else {
-            res.status(400).json({
-                message: "É obrigatório enviar uma imagem."
-            });
-        }
-
-    }
-}
-
-router.get("/", getCarros);
-router.get("/id/:id", getCarroById);
-router.get("/atributos", getAtributos);
-
-router.get("/:carro_id/contacto", verContacto);
-router.post("/", inserirCarro);
-
-router.get("/views/:id", getViews);
-router.get("/views/getViews/getTotal", getViewsTotal);
-
-router.post("/imagem/id/:id", uploadPhoto);
+});
 
 module.exports = router;

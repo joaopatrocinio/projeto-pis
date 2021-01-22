@@ -1,68 +1,31 @@
 const router = require('express').Router();
-const mysql = require('mysql');
-const db = require('../database');
-const checkLogin = require("../authentication/check-login")
+const modelos = require("../controllers/ModelosController")
+const checkToken = require("../authentication/check-token")
 
-function getModelos(req, res) {
-    db.query(mysql.format('SELECT * FROM modelo'), function (err, rows) {
-        if (err) {
-            throw err
-        } else {
-            res.json(rows)
-        }
-    });
-}
+router.get("/", (req, res) => {
+    modelos.getModelos()
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function getModelosByMarca(req, res) {
-    if (req.params.marca_id) {
-        db.query(mysql.format('SELECT * FROM modelo WHERE modeloMarcaId = ?', [req.params.marca_id]), function (err, rows) {
-            if (err) {
-                throw err
-            } else {
-                res.json(rows)
-            }
-        });
-    }
-}
+router.get("/marca/:marca_id", (req, res) => {
+    modelos.getModelosByMarca(req.params.marca_id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function inserirModelo(req, res) {
-    if (req.body.marcaId &&
-        req.body.modeloNome
-    ) {
-        db.query(mysql.format('INSERT INTO modelo (modeloNome, modeloMarcaId) VALUES (?, ?)', [req.body.modeloNome, req.body.marcaId]), function (err, rows) {
-            if (err) {
-                throw err
-            } else {
-                res.json({
-                    message: "Modelo inserido com sucesso.",
-                    id: rows.insertId
-                });
-            }
-        });
-    }
-}
+router.post("/", (req, res) => {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    modelos.inserirModelo(req.body.marcaId, req.body.modeloNome)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function updateModelo(req, res) {
-    if (req.params.id) {
-        if (req.body.marcaId &&
-            req.body.modeloNome
-        ) {
-            db.query(mysql.format('UPDATE modelo SET modeloNome = ?, modeloMarcaId = ? WHERE id = ?', [req.body.modeloNome, req.body.marcaId, req.params.id]), function (err, rows) {
-                if (err) {
-                    throw err
-                } else {
-                    res.json({
-                        message: "Modelo atualizado com sucesso."
-                    });
-                }
-            });
-        }
-    }
-}
-
-router.get("/", getModelos);
-router.get("/marca/:marca_id", getModelosByMarca);
-router.put("/id/:id", updateModelo);
-router.post("/", inserirModelo);
+router.put("/id/:id", (req, res) => {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    modelos.updateModelo(req.params.id, req.body.marcaId, req.body.modeloNome)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
 module.exports = router;

@@ -64,6 +64,11 @@ app.use("/api/marcas", require("./routes/marcas"))
 app.use("/api/modelos", require("./routes/modelos"))
 app.use("/api/utilizadores", require("./routes/utilizadores"))
 
+// Require Controllers
+const CarroController = require("./controllers/CarroController")
+const MarcasController = require("./controllers/MarcasController")
+const ModelosController = require("./controllers/ModelosController")
+
 // Views
 app.get("/", (req, res) => {
     if (!req.cookies.access_token) return res.render("home");
@@ -80,16 +85,16 @@ app.get("/estatisticas", (req, res) => {
 })
 
 app.get("/carros", checkLogin, (req, res) => {
-    axios.get("http://localhost:8080/api/carro")
+    CarroController.getCarros()
     .then(response => {
-        axios.get("http://localhost:8080/api/marcas")
+        MarcasController.getMarcas()
         .then(response2 => {
-            axios.get("http://localhost:8080/api/marcas")
+            ModelosController.getModelos()
             .then(response3 => {
                 res.render("carros", {
-                    carros: response.data,
-                    marcas: response2.data,
-                    modelos: response3.data,
+                    carros: response,
+                    marcas: response2,
+                    modelos: response3,
                     token: req.cookies.access_token,
                     isAdmin: req.user.userTypeId == 1 ? true : false,
                     isSeller: req.user.userTypeId == 2 ? true : false,
@@ -110,19 +115,19 @@ app.get("/carros", checkLogin, (req, res) => {
 })
 
 app.get("/carros", (req, res) => {
-    axios.get("http://localhost:8080/api/carro")
+    CarroController.getCarros()
     .then(response => {
-        axios.get("http://localhost:8080/api/marcas")
+        MarcasController.getMarcas()
         .then(response2 => {
-            axios.get("http://localhost:8080/api/modelos")
+            ModelosController.getModelos()
             .then(response3 => {
                 res.render("carros", {
-                    carros: response.data.map(carro => {
+                    carros: response.map(carro => {
                         carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor;
                         return carro;
                     }),
-                    marcas: response2.data,
-                    modelos: response3.data
+                    marcas: response2,
+                    modelos: response3
                 })
             })
             .catch(err => {
@@ -139,10 +144,10 @@ app.get("/carros", (req, res) => {
 })
 
 app.get("/marcas", checkLogin.forbidden, (req, res) => {
-    axios.get("http://localhost:8080/api/marcas")
+    MarcasController.getMarcas()
     .then(response => {
         res.render("marcas", {
-            marcas: response.data
+            marcas: response
         })
     })
     .catch(err => {

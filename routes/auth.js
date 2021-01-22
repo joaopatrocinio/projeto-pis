@@ -1,9 +1,7 @@
 const router = require('express').Router();
-const mysql = require('mysql');
 const db = require('../database.js');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken")
-const passport = require('passport');
 
 function login(req, res, next) {
     db.query('SELECT * FROM users WHERE email = ?', [req.body.email], function (err, rows) {
@@ -62,23 +60,31 @@ function signup(req, res, next) {
     else { res.status(400).json({ message: 'Campos em falta.' }); }
 }
 
-function logout(req, res) {
-    req.logout();
-    res.json({ message: 'Logout efetuado com sucesso' });
-}
-
-function verify(req, res) {
-    if (req.user) {
-        res.json({ message: 'Utilizador está logado.', user: req.user })
-    }
-    else {
-        res.json({ message: 'Utilizador não está logado.' })
-    }
+function me(req, res) {
+    var token = req.headers['x-access-token'];
+    if (!token) return res.status(401).json({ message: "Não tem uma sessão iniciada." });
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) return res.status(500).json({
+            message: 'Ocorreu um erro ao identificar o seu token de acesso. Tente outra vez.'
+        });
+        db.query('SELECT id, userTypeId FROM users WHERE id = ?', [decoded.id], function (error, results, fields) {
+            if (error) {
+                return res.status(500).json({
+                    message: "Ocorreu um erro na base de dados. Tente outra vez."
+                })
+            }
+            if (!results[0]) {
+                return res.status(403).json({
+                    message: 'Token de acesso inválido. Não tem login feito.'
+                });
+            }
+            res.json(results[0])
+        });
+    })
 }
 
 router.post('/login', login);
 router.post('/signup', signup);
-router.get('/logout', logout);
-router.get('/verify', verify);
+router.get('/me', me);
 
 module.exports = router;

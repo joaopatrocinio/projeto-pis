@@ -1,64 +1,31 @@
 const router = require('express').Router();
-const mysql = require('mysql');
-const db = require('../database');
-const checkLogin = require("../authentication/check-login")
+const marcas = require("../controllers/MarcasController")
+const checkToken = require("../authentication/check-token")
 
-function getMarcas(req, res) {
-    db.query(mysql.format('SELECT * FROM marca'), function (err, rows) {
-        if (err) {
-            throw err
-        } else {
-            res.json(rows)
-        }
-    });
-}
+router.get("/", (req, res) => {
+    marcas.getMarcas()
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function getMarcaById(req, res) {
-    if (req.params.id) {
-        db.query(mysql.format('SELECT * FROM marca WHERE id = ?', [req.params.id]), function (err, rows) {
-            if (err) {
-                throw err
-            } else {
-                res.json(rows)
-            }
-        });
-    }
-}
+router.get("/id/:id", (req, res) => {
+    marcas.getMarcaById(req.params.id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function inserirMarcas(req, res) {
-    if (req.body.marcaNome) {
-        db.query(mysql.format('INSERT INTO marca (marcaNome) VALUES (?)', [req.body.marcaNome]), function (err, rows) {
-            if (err) {
-                throw err
-            } else {
-                res.json({
-                    message: "Marca inserida com sucesso.",
-                    id: rows.insertId
-                });
-            }
-        });
-    }
-}
+router.post("/", checkToken, (req, res) => {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    marcas.inserirMarcas(req.body.marcaNome)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
-function updateMarcas(req, res) {
-    if (req.params.id) {
-        if (req.body.marcaNome) {
-            db.query(mysql.format('UPDATE marca SET marcaNome = ? WHERE id = ?', [req.body.marcaNome, req.params.id]), function (err, rows) {
-                if (err) {
-                    throw err
-                } else {
-                    res.json({
-                        message: "Marca atualizada com sucesso."
-                    });
-                }
-            });
-        }
-    }
-}
-
-router.get("/", getMarcas);
-router.get("/id/:id", getMarcaById);
-router.post("/", inserirMarcas);
-router.put("/id/:id", updateMarcas);
+router.put("/id/:id", checkToken, (req, res) => {
+    if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    marcas.updateMarcas(req.body.marcaNome, req.params.id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
 
 module.exports = router;
