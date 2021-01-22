@@ -92,7 +92,10 @@ app.get("/carros", checkLogin, (req, res) => {
             ModelosController.getModelos()
             .then(response3 => {
                 res.render("carros", {
-                    carros: response,
+                    carros: response.map(carro => {
+                        carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor;
+                        return carro;
+                    }),
                     marcas: response2,
                     modelos: response3,
                     token: req.cookies.access_token,
@@ -148,6 +151,38 @@ app.get("/marcas", checkLogin.forbidden, (req, res) => {
     .then(response => {
         res.render("marcas", {
             marcas: response,
+            token: req.cookies.access_token,
+            isAdmin: req.user.userTypeId == 1 ? true : false,
+            isSeller: req.user.userTypeId == 2 ? true : false,
+            isBuyer: req.user.userTypeId == 3 ? true : false
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
+app.get("/modelos", checkLogin.forbidden, (req, res) => {
+    ModelosController.getModelos()
+    .then(response => {
+        res.render("modelos", {
+            modelos: response,
+            token: req.cookies.access_token,
+            isAdmin: req.user.userTypeId == 1 ? true : false,
+            isSeller: req.user.userTypeId == 2 ? true : false,
+            isBuyer: req.user.userTypeId == 3 ? true : false
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
+app.get("/utilizadores", checkLogin.forbidden, (req, res) => {
+    ModelosController.getModelos()
+    .then(response => {
+        res.render("utilizadores", {
+            modelos: response,
             token: req.cookies.access_token,
             isAdmin: req.user.userTypeId == 1 ? true : false,
             isSeller: req.user.userTypeId == 2 ? true : false,

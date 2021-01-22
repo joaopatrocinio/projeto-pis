@@ -28,7 +28,7 @@ function getMarcaById(id) {
 
 function inserirMarcas(marcaNome) {
     return new Promise((resolve, reject) => {
-        if (req.body.marcaNome) {
+        if (marcaNome) {
             db.query('INSERT INTO marca (marcaNome) VALUES (?)', [marcaNome], function (err, rows) {
                 if (err) {
                     reject(err)

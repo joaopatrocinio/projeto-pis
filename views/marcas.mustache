@@ -79,6 +79,12 @@
 
 <script>
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 function addMarc() {
     const xhr = new XMLHttpRequest();
     const request = JSON.stringify({
@@ -86,6 +92,7 @@ function addMarc() {
     });
 
     xhr.open("POST", "/api/marcas");
+    xhr.setRequestHeader("X-Access-Token", getCookie("access_token"));
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.responseType = "json";
     let self = this;
