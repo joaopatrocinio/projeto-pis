@@ -147,7 +147,11 @@ app.get("/marcas", checkLogin.forbidden, (req, res) => {
     MarcasController.getMarcas()
     .then(response => {
         res.render("marcas", {
-            marcas: response
+            marcas: response,
+            token: req.cookies.access_token,
+            isAdmin: req.user.userTypeId == 1 ? true : false,
+            isSeller: req.user.userTypeId == 2 ? true : false,
+            isBuyer: req.user.userTypeId == 3 ? true : false
         })
     })
     .catch(err => {
