@@ -3,7 +3,7 @@
 
 <body>
     {{ >nav }}
-    <main class="my-5">
+    <main class="container my-5">
         <h4 class="display-4">Modelos</h4>
         <table id="modeloTable" class="table table-striped table-bordered rounded">
             <tbody>
@@ -44,7 +44,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="marca-update">Marca:</label>
-                            <select class="form-control mr-2" id="selectMarcas1">
+                            <select class="form-control mr-2" id="marca-update">
                                 {{ #marcas }}
                                 <option value="{{ id }}">{{ marcaNome }}</option>
                                 {{ /marcas }}
@@ -100,6 +100,14 @@
 </html>
 
 <script>
+    let modelos = [];
+    {{ #modelos }}
+        modelos.push({
+            id: {{ id }},
+            modeloNome: "{{ modeloNome }}",
+            marcaId: {{ modeloMarcaId }}
+        })
+    {{ /modelos }}
     document.getElementById("Adicionar-Modelo").addEventListener("click", function () {
         addModelo()
     });
@@ -116,7 +124,7 @@
         const xhr = new XMLHttpRequest();
         const request = JSON.stringify({
             marcaId: document.getElementById("selectMarcas").value,
-            modeloNome: document.getElementById("modeloNome-insert").value
+            modeloNome: document.getElementById("modeloNome-add").value
         });
         xhr.open("POST", "/api/modelos");
         xhr.setRequestHeader("X-Access-Token", getCookie("access_token"));
@@ -135,13 +143,28 @@
         xhr.send(request);
     }
 
-
     function carregarModeloModal(id) {
+        let modelo = modelos.find(modelo => modelo.id == id);
+        document.getElementById("marca-update").value = "";
+        document.getElementById("modelo-Update").value = "";
+        document.getElementById("marca-update").value = modelo.marcaId;
+        document.getElementById("modelo-Update").value = modelo.modeloNome;
+
+        // limpar eventListeners anteriores
+        var old_element = document.getElementById("gravar-Modelo");
+        var new_element = old_element.cloneNode(true);
+        old_element.parentNode.replaceChild(new_element, old_element);
+
         document.getElementById("gravar-Modelo").addEventListener("click", function () {
+            updateModelo(id);
+        });
+    }
+
+    function updateModelo(id) {
         const xhr = new XMLHttpRequest();
         const request = JSON.stringify({
-            marcaId: document.getElementById("selectMarcas").value,
-            modeloNome: document.getElementById("modeloNome-add").value
+            marcaId: document.getElementById("marca-update").value,
+            modeloNome: document.getElementById("modelo-Update").value
         });
         xhr.open("PUT", "/api/modelos/id/" + id);
         xhr.setRequestHeader("X-Access-Token", getCookie("access_token"));
@@ -158,6 +181,5 @@
             }
         };
         xhr.send(request);
-        })
     }
 </script>
