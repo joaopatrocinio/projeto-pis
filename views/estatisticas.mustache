@@ -3,37 +3,37 @@
 
 <body>
     {{ >nav }}
-<div class="view" id="estatisticas" style="display: block;">
+<div class="view container my-5" id="estatisticas" style="display: block;">
                 <h4 class="display-4">Estatísticas</h4>
                 <div class="d-flex flex-wrap">
                     <div class="card m-2">
                         <div class="card-body card-success">
                             <strong>Total de utilizadores: </strong>
-                            <span id="statsTotalUsers">3</span>
+                            <span id="statsTotalUsers">{{ totalUtilizadores }}</span>
                         </div>
                     </div>
                     <div class="card m-2">
                         <div class="card-body card-success">
                             <strong>Total de carros (anúncios): </strong>
-                            <span id="statsTotalCarros">1</span>
+                            <span id="statsTotalCarros">{{ totalCarros }}</span>
                         </div>
                     </div>
                     <div class="card m-2">
                         <div class="card-body card-success">
                             <strong>Total de marcas: </strong>
-                            <span id="statsTotalMarcas">31</span>
+                            <span id="statsTotalMarcas">{{ totalMarcas }}</span>
                         </div>
                     </div>
                     <div class="card m-2">
                         <div class="card-body card-success">
                             <strong>Carro mais caro: </strong>
-                            <span id="statsMaxCarPrice">26.990€</span>
+                            <span id="statsMaxCarPrice">{{ carroMaisCaro }}</span>
                         </div>
                     </div>
                     <div class="card m-2">
                         <div class="card-body card-success">
                             <strong>Total visualizações: </strong>
-                            <span id="statsTotalViews">0</span>
+                            <span id="statsTotalViews">{{ totalViews }}</span>
                         </div>
                     </div>
                 </div>

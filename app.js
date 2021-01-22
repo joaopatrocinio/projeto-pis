@@ -68,6 +68,7 @@ app.use("/api/utilizadores", require("./routes/utilizadores"))
 const CarroController = require("./controllers/CarroController")
 const MarcasController = require("./controllers/MarcasController")
 const ModelosController = require("./controllers/ModelosController")
+const UtilizadoresController = require("./controllers/UtilizadoresController")
 
 // Views
 app.get("/", (req, res) => {
@@ -80,8 +81,50 @@ app.get("/", (req, res) => {
     })
 })
 
-app.get("/estatisticas", (req, res) => {
-    res.render("estatisticas")
+app.get("/estatisticas", checkAdmin, (req, res) => {
+    CarroController.getCarros()
+    .then(response => {
+        MarcasController.getMarcas()
+        .then(response2 => {
+            UtilizadoresController.getUtilizadores()
+            .then(response3 => {
+                let carros = response.map(carro => {
+                    carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor;
+                    return carro;
+                })
+                let totalUtilizadores = response3.length;
+                let totalCarros = response.length;
+                let totalMarcas = response2.length;
+                let carroMaisCaro = 0;
+                carroMaisCaro = response.find(carro => carro.preco > carroMaisCaro).preco + "€";
+                let totalViews;
+                CarroController.getViewsTotal()
+                .then(response4 => {
+                    totalViews = response4.views;
+                    res.render("estatisticas", {
+                        totalUtilizadores: totalUtilizadores,
+                        totalCarros: totalCarros,
+                        totalMarcas: totalMarcas,
+                        carroMaisCaro: carroMaisCaro,
+                        totalViews: totalViews,
+                        token: req.cookies.access_token,
+                        isAdmin: req.user.userTypeId == 1 ? true : false,
+                        isSeller: req.user.userTypeId == 2 ? true : false,
+                        isBuyer: req.user.userTypeId == 3 ? true : false
+                    })
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
 })
 
 app.get("/carros", checkLogin, (req, res) => {
@@ -146,7 +189,7 @@ app.get("/carros", (req, res) => {
     })
 })
 
-app.get("/marcas", checkLogin.forbidden, (req, res) => {
+app.get("/marcas", checkAdmin, (req, res) => {
     MarcasController.getMarcas()
     .then(response => {
         res.render("marcas", {
@@ -162,31 +205,48 @@ app.get("/marcas", checkLogin.forbidden, (req, res) => {
     })
 })
 
-app.get("/modelos", checkLogin.forbidden, (req, res) => {
+app.get("/modelos", checkAdmin, (req, res) => {
     ModelosController.getModelos()
     .then(response => {
-        res.render("modelos", {
-            modelos: response,
-            token: req.cookies.access_token,
-            isAdmin: req.user.userTypeId == 1 ? true : false,
-            isSeller: req.user.userTypeId == 2 ? true : false,
-            isBuyer: req.user.userTypeId == 3 ? true : false
-        })
+        MarcasController.getMarcas()
+            .then(response2 => {
+                res.render("modelos", {
+                    modelos: response,
+                    marcas: response2,
+                    token: req.cookies.access_token,
+                    isAdmin: req.user.userTypeId == 1 ? true : false,
+                    isSeller: req.user.userTypeId == 2 ? true : false,
+                    isBuyer: req.user.userTypeId == 3 ? true : false
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
     })
     .catch(err => {
         console.log(err)
     })
 })
 
-app.get("/utilizadores", checkLogin.forbidden, (req, res) => {
-    ModelosController.getModelos()
+app.get("/utilizadores", checkAdmin, (req, res) => {
+    UtilizadoresController.getUtilizadores()
     .then(response => {
-        res.render("utilizadores", {
-            modelos: response,
-            token: req.cookies.access_token,
-            isAdmin: req.user.userTypeId == 1 ? true : false,
-            isSeller: req.user.userTypeId == 2 ? true : false,
-            isBuyer: req.user.userTypeId == 3 ? true : false
+        UtilizadoresController.getUserTypes()
+        .then(response2 => {
+            res.render("utilizadores", {
+                users: response.map(user => {
+                    user.userType = response2.find(userType => user.userTypeId == userType.id).userType;
+                    return user;
+                }),
+                tipos: response2,
+                token: req.cookies.access_token,
+                isAdmin: req.user.userTypeId == 1 ? true : false,
+                isSeller: req.user.userTypeId == 2 ? true : false,
+                isBuyer: req.user.userTypeId == 3 ? true : false
+            })  
+        })
+        .catch(err => {
+            console.log(err)
         })
     })
     .catch(err => {

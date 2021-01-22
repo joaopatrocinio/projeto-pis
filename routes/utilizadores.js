@@ -14,14 +14,14 @@ router.get("/id/:id", (req, res) => {
     .catch(err => console.log(err))
 });
 
-router.put("/id/:id", (req, res) => {
+router.put("/id/:id", checkToken, (req, res) => {
     if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
     utilizadores.updateUtilizador(req.params.id, req.body.firstName, req.body.lastName, req.body.email, req.body.userTypeId, req.body.contacto)
     .then(result => res.json(result))
     .catch(err => console.log(err))
 });
 
-router.delete("/id/:id", (req, res) => {
+router.delete("/id/:id", checkToken, (req, res) => {
     if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
     utilizadores.deleteUtilizador(req.params.id)
     .then(result => res.json(result))

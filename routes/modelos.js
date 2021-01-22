@@ -14,14 +14,14 @@ router.get("/marca/:marca_id", (req, res) => {
     .catch(err => console.log(err))
 });
 
-router.post("/", (req, res) => {
+router.post("/", checkToken, (req, res) => {
     if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
     modelos.inserirModelo(req.body.marcaId, req.body.modeloNome)
     .then(result => res.json(result))
     .catch(err => console.log(err))
 });
 
-router.put("/id/:id", (req, res) => {
+router.put("/id/:id", checkToken, (req, res) => {
     if (!req.isAdmin) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
     modelos.updateModelo(req.params.id, req.body.marcaId, req.body.modeloNome)
     .then(result => res.json(result))

@@ -2,7 +2,7 @@ const db = require('../database');
 
 function getModelos() {
     return new Promise((resolve, reject) => {
-        db.query('SELECT * FROM modelo INNER JOIN marca ON modeloMarcaId = marca.id', function (err, rows) {
+        db.query('SELECT modelo.*, marca.marcaNome FROM modelo INNER JOIN marca ON modeloMarcaId = marca.id', function (err, rows) {
             if (err) {
                 reject(err)
             } else {

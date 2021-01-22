@@ -3,7 +3,7 @@
 
 <body>
     {{ >nav }}
-<main class="my-5">
+<main class="container my-5">
     <h4 class="display-4">Utilizadores</h4>
     <table id="usersTable" class="table table-striped table-bordered rounded">
         <tbody>
@@ -24,16 +24,145 @@
                 <td>{{ firstName  }}</td>
                 <td>{{ lastName  }}</td>
                 <td>{{ contacto  }}</td>
-                <td>{{ userTypeId  }}</td>
-                <td><i class="fas fa-user-minus" title="Apagar" onclick="info.deleteUser({{ id }})"
+                <td>{{ userType  }}</td>
+                <td><i class="fas fa-user-minus" title="Apagar" onclick="deleteUser({{ id }})"
                         aria-hidden="true"></i><span class="sr-only">Apagar</span></td>
                 <td><i class="fas fa-user-edit" title="Editar" data-toggle="modal" data-target="#updateModal"
-                        onclick="info.carregarUtilizadorModal({{ id }})" aria-hidden="true"></i><span
+                        onclick="carregarUtilizadorModal({{ id }})" aria-hidden="true"></i><span
                         class="sr-only">Editar</span></td>
             </tr>
              {{ /users  }}
         </tbody>
     </table>
 </main>
+<!-- ATUALIZAR UTILIZADOR  -->
+            <div class="modal" id="updateModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Atualizar utilizador</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="email-update">Email:</label>
+                                <input type="email" class="form-control" placeholder="Introduza o email" id="email-update">
+                            </div>
+                            <div class="form-group">
+                                <label for="firstName-update">Primeiro nome:</label>
+                                <input type="text" class="form-control" placeholder="Introduza o primeiro nome" id="firstName-update">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName-update">Apelido:</label>
+                                <input type="text" class="form-control" placeholder="Introduza o apelido" id="lastName-update">
+                            </div>
+                            <div class="form-group">
+                                <label for="contacto-update">Contacto:</label>
+                                <input type="text" class="form-control" placeholder="Introduza o contacto" maxlength="9" id="contacto-update">
+                            </div>
+                            <div class="form-group">
+                                <label for="userTypeId-update">Tipo de utilizador:</label>
+                                <!--<input type="text" class="form-control" placeholder="Introduza o tipo de utilizador" id="userTypeId-update">-->
+                                <select class="form-control" id="userTypeId-update">
+                                {{#tipos}}
+                                    <option value="{{ id }}">{{userType}}</option>
+                                {{/tipos}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal" id="gravar-update">Gravar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </body>
+    <script>
+    let utilizadores = [];
+
+    {{ #users }}
+        utilizadores.push({
+            id: {{ id }},
+            email: "{{ email }}",
+            firstName: "{{ firstName }}",
+            lastName: "{{ lastName }}",
+            userTypeId: {{ userTypeId }},
+            contacto: "{{ contacto }}"
+        })
+    {{ /users }}
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    function deleteUser(id) {
+        if (confirm("Deseja apagar o utilizador?")) {
+            const xhr = new XMLHttpRequest();
+            var url = "/api/utilizadores/id/" + id;
+            xhr.open("DELETE", url);
+            xhr.setRequestHeader("X-Access-Token", getCookie("access_token"));
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.responseType = "json";
+            let self = this;
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        window.location.reload();
+                    } else {
+                        console.error("Erro ao apagar utilizador.");
+                    }
+                }
+            };
+            xhr.send();
+        }
+    }
+    function carregarUtilizadorModal(id) {
+        let utilizador = utilizadores.find(utilizador => utilizador.id == id);
+        document.getElementById("email-update").value = "";
+        document.getElementById("firstName-update").value = "";
+        document.getElementById("lastName-update").value = "";
+        document.getElementById("userTypeId-update").value = "";
+        document.getElementById("contacto-update").value = "";
+        document.getElementById("email-update").value = utilizador.email;
+        document.getElementById("firstName-update").value = utilizador.firstName;
+        document.getElementById("lastName-update").value = utilizador.lastName;
+        document.getElementById("contacto-update").value = utilizador.contacto;
+        document.getElementById("userTypeId-update").value = utilizador.userTypeId;
+        console.log(utilizador);
+        // limpar eventListeners anteriores
+        var old_element = document.getElementById("gravar-update");
+        var new_element = old_element.cloneNode(true);
+        old_element.parentNode.replaceChild(new_element, old_element);
+        document.getElementById("gravar-update").addEventListener("click", function () {
+            updateUtilizador(id);
+        });
+    }
+    function updateUtilizador(id) {
+        const xhr = new XMLHttpRequest();
+        const request = JSON.stringify({
+            email: document.getElementById("email-update").value,
+            firstName: document.getElementById("firstName-update").value,
+            lastName: document.getElementById("lastName-update").value,
+            userTypeId: document.getElementById("userTypeId-update").value,
+            contacto: document.getElementById("contacto-update").value
+        });
+
+        xhr.open("PUT", "/api/utilizadores/id/" + id);
+        xhr.setRequestHeader("X-Access-Token", getCookie("access_token"));
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.responseType = "json";
+        let self = this;
+        xhr.onreadystatechange = function () {
+            if (this.readyState === 4) {
+                if (this.status === 200) {
+                    window.location.reload();
+                } else {
+                    console.error("Erro ao atualizar utilizador no servidor.");
+                }
+            }
+        };
+        xhr.send(request);
+    }
+    </script>
 </html>
