@@ -65,6 +65,7 @@ app.use("/api/modelos", require("./routes/modelos"))
 app.use("/api/utilizadores", require("./routes/utilizadores"))
 
 // Require Controllers
+const AuthController = require("./controllers/AuthController")
 const CarroController = require("./controllers/CarroController")
 const MarcasController = require("./controllers/MarcasController")
 const ModelosController = require("./controllers/ModelosController")
@@ -259,13 +260,13 @@ app.get("/login", (req, res) => {
 })
 
 app.post("/login", (req, res) => {
-    axios.post("http://localhost:8080/api/auth/login", req.body)
-    .then(response => {
-        req.login(response.data.user, function (err) {
+    AuthController.login(req.body.email, req.body.password)
+    .then(user => {
+        req.login(user, function (err) {
             if (err) { console.log(err); }
             else {
                 var token = jwt.sign({
-                    id: response.data.user.id,
+                    id: user.id,
                 }, process.env.JWT_SECRET, {
                     expiresIn: 6064800 // expires in 1 week
                 });
@@ -275,16 +276,17 @@ app.post("/login", (req, res) => {
             }
         });
     })
+    .catch(err => console.log(err))
 })
 
 app.post("/registo", (req, res) => {
-    axios.post("http://localhost:8080/api/auth/signup", req.body)
-    .then(response => {
-        req.login(response.data.user, function (err) {
+    AuthController.signup(req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.userTypeId, req.body.contacto)
+    .then(data => {
+        req.login(data.user, function (err) {
             if (err) { console.log(err); }
             else {
                 var token = jwt.sign({
-                    id: response.data.user.id,
+                    id: data.user.id,
                 }, process.env.JWT_SECRET, {
                     expiresIn: 6064800 // expires in 1 week
                 });
@@ -294,6 +296,7 @@ app.post("/registo", (req, res) => {
             }
         });
     })
+    .catch(err => console.log(err))
 })
 
 app.get("/logout", (req, res) => {
