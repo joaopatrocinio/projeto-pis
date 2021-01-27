@@ -159,6 +159,32 @@ function uploadPhoto(id, file) {
     });
 }
 
+function getCarrosVendedor(id) {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT id, descricao FROM carro WHERE userId = ?', [id], function (err, rows) {
+            if (err) {
+                reject(err)
+            } else {
+                db.query('SELECT * FROM atributos', function (err, rows2) {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(rows.map(carro => {
+                        carro.preco = rows2.find(atributo => {
+                            if (atributo.atributo == "preco") {
+                                if (atributo.carroid == carro.id) {
+                                    return true
+                                }
+                            }
+                        }).valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
+                        return carro
+                    }))
+                });
+            }
+        });
+    })
+}
+
 module.exports.getCarros = getCarros;
 module.exports.getCarroById = getCarroById;
 module.exports.verContacto = verContacto;
@@ -166,3 +192,4 @@ module.exports.inserirCarro = inserirCarro;
 module.exports.getViews = getViews;
 module.exports.getViewsTotal = getViewsTotal;
 module.exports.uploadPhoto = uploadPhoto;
+module.exports.getCarrosVendedor = getCarrosVendedor;

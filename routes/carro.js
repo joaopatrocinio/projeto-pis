@@ -68,4 +68,11 @@ router.post("/imagem/id/:id", checkToken, (req, res) => {
     }
 });
 
+router.get("/vendedor", checkToken, (req, res) => {
+    if (req.isBuyer) return res.status(403).json({ message: "Não tem permissão para fazer este pedido." })
+    carros.getCarrosVendedor(req.user.id)
+    .then(result => res.json(result))
+    .catch(err => console.log(err))
+});
+
 module.exports = router;

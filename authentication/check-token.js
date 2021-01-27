@@ -23,6 +23,7 @@ router.use((req, res, next) => {
                     message: 'Token de acesso inválido. Não tem login feito.'
                 });
             }
+            req.user = results[0]
             req.isAdmin = false;
             req.isSeller = false;
             req.isBuyer = false;

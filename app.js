@@ -12,6 +12,7 @@ require('dotenv').config()
 const db = require("./database");
 const checkLogin = require("./authentication/check-login");
 const checkAdmin = require("./authentication/check-admin");
+const checkSeller = require("./authentication/check-seller");
 const passportSetup = require("./authentication/passport");
 
 // Express settings
@@ -90,7 +91,7 @@ app.get("/estatisticas", checkAdmin, (req, res) => {
             UtilizadoresController.getUtilizadores()
             .then(response3 => {
                 let carros = response.map(carro => {
-                    carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor;
+                    carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
                     return carro;
                 })
                 let totalUtilizadores = response3.length;
@@ -137,7 +138,7 @@ app.get("/carros", checkLogin, (req, res) => {
             .then(response3 => {
                 res.render("carros", {
                     carros: response.map(carro => {
-                        carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor;
+                        carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
                         return carro;
                     }),
                     marcas: response2,
@@ -170,7 +171,7 @@ app.get("/carros", (req, res) => {
             .then(response3 => {
                 res.render("carros", {
                     carros: response.map(carro => {
-                        carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor;
+                        carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
                         return carro;
                     }),
                     marcas: response2,
@@ -253,6 +254,20 @@ app.get("/utilizadores", checkAdmin, (req, res) => {
     .catch(err => {
         console.log(err)
     })
+})
+
+app.get("/anuncios", checkSeller, (req, res) => {
+    CarroController.getCarrosVendedor(req.user.id)
+    .then(response => {
+        res.render("anuncios", {
+            token: req.cookies.access_token,
+            isAdmin: req.user.userTypeId == 1 ? true : false,
+            isSeller: req.user.userTypeId == 2 ? true : false,
+            isBuyer: req.user.userTypeId == 3 ? true : false,
+            anuncios: response
+        })
+    })
+    .catch(err => console.log(err))
 })
 
 app.get("/login", (req, res) => {

@@ -1,6 +1,6 @@
-function checkAdmin(req, res, next) {
+function checkSeller(req, res, next) {
     if (!req.user) return res.render("403");
-    if (req.user.userTypeId == 1) {
+    if (req.user.userTypeId == 2) {
         next();
     } else {
         res.render("403", {
@@ -12,4 +12,4 @@ function checkAdmin(req, res, next) {
     }
 }
 
-module.exports = checkAdmin;
+module.exports = checkSeller;
