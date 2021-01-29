@@ -198,17 +198,25 @@ function getCarrosVendedor(id) {
                 db.query('SELECT * FROM atributos', function (err, rows2) {
                     if (err) {
                         reject(err)
-                    }
-                    resolve(rows.map(carro => {
-                        carro.preco = rows2.find(atributo => {
-                            if (atributo.atributo == "preco") {
-                                if (atributo.carroid == carro.id) {
-                                    return true
-                                }
+                    }else{
+                        db.query("SELECT * FROM log_mostrar_contacto ", function (err, rows3) {
+                            if (err) {
+                                reject(err)
+                            } else {
+                                resolve(rows.map(carro => {
+                                    carro.preco = rows2.find(atributo => {
+                                        if (atributo.atributo == "preco") {
+                                            if (atributo.carroid == carro.id) {
+                                                return true
+                                            }
+                                        }
+                                    }).valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
+                                    carro.views = rows3.filter(x =>x.carroId == carro.id).length;
+                                    return carro
+                                }))
                             }
-                        }).valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
-                        return carro
-                    }))
+                        })
+                    }                
                 });
             }
         });
