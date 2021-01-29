@@ -12,7 +12,7 @@ function getCarros() {
                         reject(err)
                     }
                     resolve(rows.map(carro => {
-                        carro.atributos = rows2.map(atributo => {
+                        carro.atributos = rows2.filter(atributo => {
                             if (atributo.carroid == carro.id) {
                                 return {
                                     atributo: atributo.atributo,
@@ -35,7 +35,22 @@ function getCarroById(id) {
                 if (err) {
                     reject(err)
                 } else {
-                    resolve(rows)
+                    db.query('SELECT * FROM atributos', function (err, rows2) {
+                        if (err) {
+                            reject(err)
+                        }
+                        resolve(rows.map(carro => {
+                            carro.atributos = rows2.filter(atributo => {
+                                if (atributo.carroid == carro.id) {
+                                    return {
+                                        atributo: atributo.atributo,
+                                        valor: atributo.valor
+                                    }
+                                }
+                            });
+                            return carro
+                        }))
+                    });
                 }
             });
         }
@@ -94,9 +109,16 @@ function inserirCarro(marcaId, modeloId, descricao, ano, preco, quilometro, velo
                 if (err) {
                     reject(err)
                 } else {
-                    resolve({
-                        message: "Carro inserido com sucesso."
-                    });
+                    db.query("SELECT id FROM carro ORDER BY id DESC LIMIT 1", (err, rows2) => {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve({
+                                message: "Carro inserido com sucesso.",
+                                id: rows2[0].id
+                            });
+                        }
+                    })
                 }
             });
         } else {
@@ -135,20 +157,28 @@ function getViewsTotal(req, res) {
 
 function uploadPhoto(id, file) {
     return new Promise((resolve, reject) => {
-        if (!fs.existsSync("./www/uploads/")) {
-            fs.mkdirSync("./www/uploads/");
+        if (!fs.existsSync("./public/uploads/")) {
+            console.log("criar pasta")
+            fs.mkdirSync("./public/uploads/");
         }
+        console.log(id)
         if (id) {
             var filename = id + "." + file.mimetype.split("/")[1];
             if (file.mimetype.split("/")[0] == "image") {
-                file.mv("./www/uploads/" + filename, function (err) {
+                file.mv("./public/uploads/" + filename, function (err) {
                     if (err) reject({
                         message: "Erro ao enviar ficheiro."
                     });
-                    resolve({
-                        message: "Ficheiro enviado com sucesso.",
-                        filename: filename
-                    });
+                    db.query("UPDATE carro SET imagem = ? WHERE id = ?", [filename, id], (err, rows) => {
+                        if (err) reject({
+                            message: "Erro ao enviar ficheiro."
+                        });
+                        resolve({
+                            message: "Ficheiro enviado com sucesso.",
+                            filename: filename
+                        });
+                    })
+                    
                 })
             } else {
                 resolve({

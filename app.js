@@ -7,7 +7,9 @@ const mustacheExpress = require("mustache-express")
 const cookieParser = require('cookie-parser')
 const jwt = require("jsonwebtoken")
 const cors = require("cors")
+const upload = require("express-fileupload");
 require('dotenv').config()
+
 
 const db = require("./database");
 const checkLogin = require("./authentication/check-login");
@@ -24,6 +26,9 @@ app.use(cookieParser())
 app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 app.set('views', __dirname + '/views');
+app.use(upload({
+    preserveExtension: true
+}))
 
 // Session setup
 var options = {
@@ -191,6 +196,46 @@ app.get("/carros", (req, res) => {
     })
 })
 
+app.get("/carro/:id", checkLogin, (req, res) => {
+    CarroController.getCarroById(req.params.id)
+    .then(response => {
+        MarcasController.getMarcas()
+        .then(response2 => {
+            ModelosController.getModelos()
+            .then(response3 => {
+                res.render("detalhes", {
+                    carro: response.map(carro => {
+                        carro.Preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
+                        carro.Km =carro.atributos.find(atributo => atributo.atributo == "quilometro").valor;
+                        carro.Ano =carro.atributos.find(atributo => atributo.atributo == "ano").valor;
+                        carro.VelocidadeMax =carro.atributos.find(atributo => atributo.atributo == "velocidadeMax").valor;
+                        carro.Cilindrada =carro.atributos.find(atributo => atributo.atributo == "cilindrada").valor;
+                        carro.Combustivel =carro.atributos.find(atributo => atributo.atributo == "combustivel").valor;
+                        carro.Potencia =carro.atributos.find(atributo => atributo.atributo == "potencia").valor;
+                        carro.TipoCaixa =carro.atributos.find(atributo => atributo.atributo == "tipoCaixa").valor;
+                        return carro;
+                    }),
+                    marcas: response2,
+                    modelos: response3,
+                    token: req.cookies.access_token,
+                    isAdmin: req.user.userTypeId == 1 ? true : false,
+                    isSeller: req.user.userTypeId == 2 ? true : false,
+                    isBuyer: req.user.userTypeId == 3 ? true : false
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 app.get("/marcas", checkAdmin, (req, res) => {
     MarcasController.getMarcas()
     .then(response => {
@@ -268,6 +313,49 @@ app.get("/anuncios", checkSeller, (req, res) => {
         })
     })
     .catch(err => console.log(err))
+})
+
+app.get("/criaranuncio", checkSeller, (req, res) => {
+    MarcasController.getMarcas()
+    .then(response => {
+        ModelosController.getModelos()
+        .then(response2 => {
+            res.render("criaranuncio", {
+                marcas: response,
+                modelos: response2,
+                token: req.cookies.access_token,
+                isAdmin: req.user.userTypeId == 1 ? true : false,
+                isSeller: req.user.userTypeId == 2 ? true : false,
+                isBuyer: req.user.userTypeId == 3 ? true : false
+            })
+        })
+        .catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+})
+
+app.post("/criaranuncio", checkSeller, (req, res) => {
+    CarroController.inserirCarro(
+        req.body.idmarca,
+        req.body.idmodelo,
+        req.body.descricao,
+        req.body.ano,
+        req.body.preco,
+        req.body.quilometro,
+        req.body.velocidadeMax,
+        req.body.cilindrada,
+        req.body.combustivel,
+        req.files.imagemCarro.name,
+        req.body.potencia,
+        req.body.tipoCaixa,
+        req.user.id
+    ).then(response => {
+        CarroController.uploadPhoto(response.id, req.files.imagemCarro)
+        .then(response2 => {
+            res.redirect("/carros")
+        })
+        .catch(err => console.log(err));
+    }).catch(err => console.log(err));
 })
 
 app.get("/login", (req, res) => {

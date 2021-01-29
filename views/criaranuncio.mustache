@@ -1,0 +1,139 @@
+<html>
+{{ >head }}
+
+<body>
+    {{ >nav }}
+    <main class="container my-5">
+        <h4 class="display-4">Criar anúncio</h4>
+        <form action="/criaranuncio" method="POST" id="addCar2" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="descricao">Título / Descrição:</label>
+                <input type="text" class="form-control" placeholder="Digite a descrição do anúncio" id="descricao" name="descricao" required="">
+            </div>
+            <div class="form-group">
+                <label for="imagemCarro">Imagem:</label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="imagemCarro" name="imagemCarro">
+                    <label class="custom-file-label" for="imagemCarro">Escolher ficheiro...</label>
+                    </div>
+            </div>
+            <div class="form-group">
+                <label for="idmarca">Marca:</label>
+                <select class="form-control" id="idmarca" name="idmarca">
+                {{ #marcas }}
+                    <option value="{{ id }}">{{ marcaNome }}</option>
+                {{ /marcas }}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="idmodelo">Modelo:</label>
+                <select class="form-control" id="idmodelo" name="idmodelo">
+                {{ #modelos }}
+                    <option value="{{ id }}">{{ modeloNome }}</option>
+                {{ /modelos }}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="preco">Preco:</label>
+                <input type="number" class="form-control" placeholder="Digite o preço" id="preco" name="preco" required="">
+            </div>
+            <div class="form-group">
+                <label for="ano">Ano:</label>
+                <input type="number" class="form-control" placeholder="Digite o ano de registo do veículo" id="ano" name="ano" required="">
+            </div>
+            <div class="form-group">
+                <label for="quilometro">Quilómetros:</label>
+                <input type="number" class="form-control" placeholder="Digite os quilómetros do veículo" id="quilometro" name="quilometro" required="">
+            </div>
+            <div class="form-group">
+                <label for="cilindrada">Cilindrada (cm<sup>3</sup>):</label>
+                <input type="number" class="form-control" placeholder="Digite a cilindrada do veículo" id="cilindrada" name="cilindrada" required="">
+            </div>
+            <div class="form-group">
+                <label for="potencia">Potência (cv):</label>
+                <input type="number" class="form-control" placeholder="Digite a potência do veículo" id="potencia" name="potencia" required="">
+            </div>
+            <div class="form-group">
+                <label for="velocidadeMax">Velocidade Máxima (km/h):</label>
+                <input type="number" class="form-control" placeholder="Digite a velocidade máximo do veículo" id="velocidadeMax" name="velocidadeMax" required="">
+            </div>
+            <div class="form-group">
+                <label for="tipoCaixa">Tipo de caixa:</label>
+                <select id="tipoCaixa" name="tipoCaixa" class="form-control">
+                    <option>Manual</option>
+                    <option>Automática</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="combustivel">Combustivel:</label>
+                <select id="combustivel" name="combustivel" class="form-control">
+                    <option>Diesel</option>
+                    <option>Gasolina</option>
+                    <option>Elétrico</option>
+                    <option>Híbrido</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Criar anúncio</button>
+        </form>
+    </main>
+</body>
+
+<script type="text/javascript">
+
+let marcas = [];
+let modelos = [];
+
+{{ #marcas }}
+    marcas.push({
+        id: {{ id }},
+        marcaNome: "{{ marcaNome }}"
+    })
+{{ /marcas }}
+
+{{ #modelos }}
+    modelos.push({
+        id: {{ id }},
+        modeloNome: "{{ modeloNome }}",
+        marcaId: {{ modeloMarcaId }}
+    })
+{{ /modelos }}
+
+let input = document.querySelector(".custom-file-input");
+input.addEventListener("change", function () {
+    var fileName = input.value.split("\\").pop();
+    document.querySelector(".custom-file-label").classList.add("selected");
+    document.querySelector(".custom-file-label").innerHTML = fileName;
+})
+
+let selectMarcas = document.getElementById("idmarca");
+let selectModelo = document.getElementById("idmodelo");
+
+selectModelo.innerHTML = "";
+for (let modelo of modelos) {
+    if (modelo.marcaId == selectMarcas.value) {
+        let op = document.createElement("Option");
+        op.value = modelo.id;
+        op.innerText = modelo.modeloNome;
+        selectModelo.appendChild(op);
+    }
+}
+
+selectMarcas.addEventListener("change", function (event) {
+    selectModelo.innerHTML = "";
+    for (let modelo of modelos) {
+        if (modelo.marcaId == event.target.value) {
+            let op = document.createElement("Option");
+            op.value = modelo.id;
+            op.innerText = modelo.modeloNome;
+            selectModelo.appendChild(op);
+        }
+    }
+});
+
+selectModelo.addEventListener("change", function (event) {
+    console.log(event.target.value);
+});
+
+</script>
+
+</html>
