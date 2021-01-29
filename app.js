@@ -236,6 +236,42 @@ app.get("/carro/:id", checkLogin, (req, res) => {
     })
 })
 
+app.get("/carro/:id", (req, res) => {
+    CarroController.getCarroById(req.params.id)
+    .then(response => {
+        MarcasController.getMarcas()
+        .then(response2 => {
+            ModelosController.getModelos()
+            .then(response3 => {
+                res.render("detalhes", {
+                    carro: response.map(carro => {
+                        carro.Preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
+                        carro.Km =carro.atributos.find(atributo => atributo.atributo == "quilometro").valor.replace(/\d(?=(?:\d{3})+$)/g, '$& ');
+                        carro.Ano =carro.atributos.find(atributo => atributo.atributo == "ano").valor;
+                        carro.VelocidadeMax =carro.atributos.find(atributo => atributo.atributo == "velocidadeMax").valor;
+                        carro.Cilindrada =carro.atributos.find(atributo => atributo.atributo == "cilindrada").valor;
+                        carro.Combustivel =carro.atributos.find(atributo => atributo.atributo == "combustivel").valor;
+                        carro.Potencia =carro.atributos.find(atributo => atributo.atributo == "potencia").valor;
+                        carro.TipoCaixa =carro.atributos.find(atributo => atributo.atributo == "tipoCaixa").valor;
+                        return carro;
+                    }),
+                    marcas: response2,
+                    modelos: response3
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 app.get("/marcas", checkAdmin, (req, res) => {
     MarcasController.getMarcas()
     .then(response => {
