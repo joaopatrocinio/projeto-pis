@@ -206,7 +206,7 @@ app.get("/carro/:id", checkLogin, (req, res) => {
                 res.render("detalhes", {
                     carro: response.map(carro => {
                         carro.Preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
-                        carro.Km =carro.atributos.find(atributo => atributo.atributo == "quilometro").valor;
+                        carro.Km =carro.atributos.find(atributo => atributo.atributo == "quilometro").valor.replace(/\d(?=(?:\d{3})+$)/g, '$& ');
                         carro.Ano =carro.atributos.find(atributo => atributo.atributo == "ano").valor;
                         carro.VelocidadeMax =carro.atributos.find(atributo => atributo.atributo == "velocidadeMax").valor;
                         carro.Cilindrada =carro.atributos.find(atributo => atributo.atributo == "cilindrada").valor;
