@@ -1,0 +1,104 @@
+<html>
+{{ >head }}
+
+<body>
+<script>
+
+function combustivel(comb){
+  
+    if (comb == "Gasolina"){
+         teste = "gasolina95simples";
+    }else {
+        teste ="gasoleoSimples";
+    }
+     const xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://roadprice.patrocinio.cf/combustivel/preco/"+ teste);
+            xhr.responseType = "json";
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        let result = xhr.response;
+                        document.getElementById("combustivel-field").outerHTML = result.preco_barato + "€ - " + result.preco_medio +" € <br>  Ultima Verificação " + result.data ;
+                    } else {
+                        console.error("Erro ao pedir contacto ao servidor.");
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+  function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+function mostrarTlm(id){
+     const xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/carro/" + id + "/contacto");
+            xhr.setRequestHeader("X-Access-Token", getCookie("access_token"));
+            xhr.responseType = "json";
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        let result = xhr.response;
+                        document.getElementById("contacto-field").outerHTML = result.contacto;
+                    } else {
+                        console.error("Erro ao pedir contacto ao servidor.");
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+</script>
+    {{ >nav }}
+
+    <main class="container my-5" style="display: block;">
+
+        <div class="view" id="detalhes">
+            <h4 class="display-4">Detalhes do carro</h4>
+            {{ #carro }}
+            <div class="row">
+                <div class="col-6 p-0">
+                    <img class="detalhes-img" id="detalhes-img-carro" src="uploads/{{ imagem }}">
+                </div>
+                <div class="col-6">
+                    <h4 id="car-title">{{descricao}}</h4>
+                    <p id="car-year-kms">{{Ano}}|{{Km}}km</p>
+                    <h3 id="car-price">PREÇO:{{Preco}}€</h3>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-6 p-0">
+                    <div class="card">
+                        <div class="card-header">Atributos do carro: </div>
+                        <div class="card-body" id="detalhes-atributos">
+                            <p><b>VelocidadeMax</b>: {{VelocidadeMax}} km/h</p>
+                            <p><b>Cilindrada</b>: {{Cilindrada}} cm<sup>3</sup></p>
+                            <p><b>Combustivel</b>: {{Combustivel}} <a id="combustivel-field" href='javascript: combustivel("{{Combustivel}}")'>Mostrar info Combustivel</a></p>
+                            <p><b>Potencia</b>: {{Potencia}} cv</p>
+                            <p><b>TipoCaixa</b>: {{TipoCaixa}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">Informações do vendedor: </div>
+                        <div class="card-body" id="detalhes-vendedor">
+                            <p><b>Nome</b>: seller seller</p>
+                            <p><b>Contacto</b>: <a id="contacto-field" href="javascript: mostrarTlm({{ id }})">Mostrar
+                                    número
+                                    de telemóvel</a></p>
+                        </div>
+                    </div>
+                </div>
+                {{ /carro }}
+            </div>
+        </div>
+
+
+    </main>
+</body>
+
+</html>
+
