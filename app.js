@@ -2,7 +2,6 @@ const express = require('express');
 const session = require("express-session");
 const MySQLStore = require('express-mysql-session')(session);
 const passport = require('passport');
-const axios = require('axios');
 const mustacheExpress = require("mustache-express")
 const cookieParser = require('cookie-parser')
 const jwt = require("jsonwebtoken")
