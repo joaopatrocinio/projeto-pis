@@ -22,7 +22,12 @@
             <div id="carrosList" class="d-flex justify-content-around flex-wrap">
             {{ #carros }}
                 <div class="card m-2 car-list-item">
-                    <img class="card-img-top" src="uploads/{{ imagem }}">
+                    {{ #imagem }}
+                        <img class="card-img-top" src="uploads/{{ imagem }}">
+                    {{ /imagem }}
+                    {{ ^imagem }}
+                        <img class="card-img-top" src="uploads/no_photo.png">
+                    {{ /imagem }}
                     <div class="card-body">
                         <h5>{{ descricao }}</h5>
                         <p>{{ preco }}€</p>
@@ -57,22 +62,42 @@
             })
         {{ /modelos }}
 
-        selectMarcas.addEventListener("change", function (event) {
-            selectModelo.innerHTML = "";
-            let op = document.createElement("Option");
-            op.value = -1;
-            op.innerText = "Todos";
-            selectModelo.appendChild(op);
-            for (let modelo of modelos) {
-                if (modelo.marcaId == event.target.value) {
-                    let op = document.createElement("Option");
-                    op.value = modelo.id;
-                    op.innerText = modelo.modeloNome;
-                    selectModelo.appendChild(op);
-                }
-            }
+        const urlParams = new URLSearchParams(window.location.search);
+        const marca = urlParams.get('marca');
+        const modelo = urlParams.get('modelo');
 
-            // É preciso fazer refresh na pagina com os dados novos com um botão a frente dos filtros
+        selectMarcas.addEventListener("change", function (event) {
+            if (event.target.value != -1)
+                window.location = "/carros?marca=" + event.target.value;
+            else
+                window.location = "/carros";
         });
+
+        selectModelo.addEventListener("change", function (event) {
+            if (event.target.value != -1)
+                window.location = "/carros?marca=" + marca + "&modelo=" + event.target.value;
+            else
+                window.location = "/carros?marca=" + marca;
+        });
+
+        if (marca) selectMarcas.value = marca;
+        else selectMarcas.value = -1;
+
+        selectModelo.innerHTML = "";
+        let op = document.createElement("Option");
+        op.value = -1;
+        op.innerText = "Todos";
+        selectModelo.appendChild(op);
+        for (let modelo of modelos) {
+            if (modelo.marcaId == marca) {
+                let op = document.createElement("Option");
+                op.value = modelo.id;
+                op.innerText = modelo.modeloNome;
+                selectModelo.appendChild(op);
+            }
+        }
+
+        if (modelo) selectModelo.value = modelo;
+        else selectModelo.value = -1;
     </script>
 </html>

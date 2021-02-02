@@ -140,6 +140,12 @@ app.get("/carros", checkLogin, (req, res) => {
         .then(response2 => {
             ModelosController.getModelos()
             .then(response3 => {
+                if (req.query.marca) {
+                    response = response.filter(carro => carro.marcaID == req.query.marca);
+                }
+                if (req.query.modelo) {
+                    response = response.filter(carro => carro.modeloId == req.query.modelo);
+                }
                 res.render("carros", {
                     carros: response.map(carro => {
                         carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');
@@ -173,6 +179,12 @@ app.get("/carros", (req, res) => {
         .then(response2 => {
             ModelosController.getModelos()
             .then(response3 => {
+                if (req.query.marca) {
+                    response = response.filter(carro => carro.marcaID == req.query.marca);
+                }
+                if (req.query.modelo) {
+                    response = response.filter(carro => carro.modeloId == req.query.modelo);
+                }
                 res.render("carros", {
                     carros: response.map(carro => {
                         carro.preco = carro.atributos.find(atributo => atributo.atributo == "preco").valor.replace(/\d(?=(?:\d{3})+$)/g, '$&.');

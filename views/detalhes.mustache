@@ -49,7 +49,7 @@ function mostrarTlm(id){
                         let result = xhr.response;
                         document.getElementById("contacto-field").outerHTML = result.contacto;
                     } else {
-                        console.error("Erro ao pedir contacto ao servidor.");
+                        document.getElementById("contacto-field").outerHTML = "Necessita login para ver o contacto!";
                     }
                 }
             };
