@@ -1,6 +1,6 @@
-drop database if exists stand;
-create database stand;
-use stand;
+drop database if exists pis;
+create database pis;
+use pis;
 
 
 CREATE TABLE userstype (
@@ -209,7 +209,7 @@ INSERT INTO carro VALUES ('6', '29', '25', '3', 'Toyota Yaris 1.4 D-4D Active', 
 CREATE TABLE atributos (
     carroid INT,
     atributo VARCHAR(20),
-    descricao VARCHAR(20),
+    valor VARCHAR(20),
     FOREIGN KEY (carroid)
         REFERENCES carro (id)
         ON DELETE CASCADE
