@@ -66,7 +66,12 @@ function mostrarTlm(id){
             {{ #carro }}
             <div class="row">
                 <div class="col-6 p-0">
-                    <img class="detalhes-img" id="detalhes-img-carro" src="/uploads/{{ imagem }}">
+                    {{ #imagem }}
+                        <img class="detalhes-img" id="detalhes-img-carro" src="/uploads/{{ imagem }}">
+                    {{ /imagem }}
+                    {{ ^imagem }}
+                        <img class="detalhes-img" id="detalhes-img-carro" src="/uploads/no_photo.png">
+                    {{ /imagem }}
                 </div>
                 <div class="col-6">
                     <h4 id="car-title">{{descricao}}</h4>
