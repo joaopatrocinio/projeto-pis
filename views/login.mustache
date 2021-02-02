@@ -4,6 +4,11 @@
 <body>
     {{ >nav }}
     <main class="container-sm view" id="login" style="display: block;">
+        {{ #erro }}
+        <div class="alert alert-danger mt-4">
+            {{erro}}
+        </div>
+        {{ /erro }}
         <div class="card-group my-5">
             <div class="card p-4">
                 <h4 class="mb-4 display-4 pb-2 border-bottom">Registo</h4>

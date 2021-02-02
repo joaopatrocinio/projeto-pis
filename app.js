@@ -401,7 +401,12 @@ app.post("/login", (req, res) => {
     AuthController.login(req.body.email, req.body.password)
     .then(user => {
         req.login(user, function (err) {
-            if (err) { console.log(err); }
+            if (err) {
+                res.render("login", {
+                    erro: err.message
+                })
+                console.log(err);
+            }
             else {
                 var token = jwt.sign({
                     id: user.id,
@@ -414,14 +419,24 @@ app.post("/login", (req, res) => {
             }
         });
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        res.render("login", {
+            erro: err.message
+        })
+        console.log(err)
+    })
 })
 
 app.post("/registo", (req, res) => {
     AuthController.signup(req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.userTypeId, req.body.contacto)
     .then(data => {
         req.login(data.user, function (err) {
-            if (err) { console.log(err); }
+            if (err) {
+                res.render("login", {
+                    erro: err.message
+                })
+                console.log(err)
+            }
             else {
                 var token = jwt.sign({
                     id: data.user.id,
@@ -434,7 +449,12 @@ app.post("/registo", (req, res) => {
             }
         });
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        res.render("login", {
+            erro: err.message
+        })
+        console.log(err)
+    })
 })
 
 app.get("/logout", (req, res) => {
